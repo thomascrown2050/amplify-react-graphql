@@ -1,4 +1,4 @@
-type Bookmarks @model @auth(rules: [{allow: public}, {allow: owner}]) {
+type Bookmark @model @auth(rules: [{allow: public}, {allow: owner}]) {
   id: ID!
   user_id: ID!
   bookmark_type: String!

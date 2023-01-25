@@ -17,7 +17,7 @@ import { listNotes } from "./graphql/queries";
 import {
   createNote as createNoteMutation,
   deleteNote as deleteNoteMutation,
-  createBookmarks as CreateBookmarksMutation
+  createBookmark as createBookmarkMutation
 } from "./graphql/mutations";
 
 // Optional Config object, but defaults to demo api-key and eth-mainnet.
@@ -57,7 +57,7 @@ const App = ({ signOut }) => {
     var currentUnixTime = date.Now();
     event.preventDefault();
     const newBookmarks = await API.graphql({
-      query: CreateBookmarksMutation,
+      query: createBookmarkMutation,
       variables: {
           input: {
       "user_id": "a3f4095e-39de-43d2-baf4-f8c16f0f6f4d",
