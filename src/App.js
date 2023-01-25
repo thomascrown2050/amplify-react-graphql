@@ -89,7 +89,7 @@ const App = ({ signOut }) => {
     fetchNotes();
     //event.target.reset();
   }
-
+*/
   async function createNote(event) {
     event.preventDefault();
     const form = new FormData(event.target);
@@ -107,7 +107,7 @@ const App = ({ signOut }) => {
     fetchNotes();
     event.target.reset();
   }
-  */
+  
 
   async function deleteNote({ id, name }) {
   const newNotes = notes.filter((note) => note.id !== id);
