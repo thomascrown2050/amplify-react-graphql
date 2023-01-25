@@ -119,10 +119,10 @@ const App = ({ signOut }) => {
   });
 }
 
+//      <h1>Current block: {currentBlock} <button onClick={createBookmark}>Save</button></h1>
   return (
     <View className="App">
       <Heading level={1}>My Notes App</Heading>
-      <h1>Current block: {currentBlock} <button onClick={createBookmark}>Save</button></h1>
       <View as="form" margin="3rem 0" onSubmit={createNote}>
         <Flex direction="row" justifyContent="center">
           <TextField
