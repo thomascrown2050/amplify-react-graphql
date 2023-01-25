@@ -1,12 +1,3 @@
-type Bookmark @model @auth(rules: [{allow: public}, {allow: owner}]) {
-  id: ID!
-  user_id: ID!
-  bookmark_type: String!
-  bookmark_value: String!
-  timestamp_unix: AWSTimestamp!
-  comments: String
-}
-
 type Note @model @auth(rules: [{allow: public}]) {
   id: ID!
   name: String!
