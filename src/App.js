@@ -17,7 +17,6 @@ import { listNotes } from "./graphql/queries";
 import {
   createNote as createNoteMutation,
   deleteNote as deleteNoteMutation,
-  createBookmark as createBookmarkMutation
 } from "./graphql/mutations";
 
 // Optional Config object, but defaults to demo api-key and eth-mainnet.
@@ -51,7 +50,7 @@ const App = ({ signOut }) => {
     );
     setNotes(notesFromAPI);
   }
-
+/*
   async function createBookmark(event){
     alert('hello world!');
     var currentUnixTime = date.Now();
@@ -70,7 +69,8 @@ const App = ({ signOut }) => {
   });
     //event.target.reset();
   }
-
+*/
+/*
   async function createTestNote(event){
     alert('hello world!');
     event.preventDefault();
@@ -107,6 +107,7 @@ const App = ({ signOut }) => {
     fetchNotes();
     event.target.reset();
   }
+  */
 
   async function deleteNote({ id, name }) {
   const newNotes = notes.filter((note) => note.id !== id);
