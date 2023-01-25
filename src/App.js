@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import { Network, Alchemy } from "alchemy-sdk";
 import "./App.css";
 import "@aws-amplify/ui-react/styles.css";
 import { API, Storage } from "aws-amplify";
@@ -16,7 +17,18 @@ import { listNotes } from "./graphql/queries";
 import {
   createNote as createNoteMutation,
   deleteNote as deleteNoteMutation,
+  createBookmarks as CreateBookmarksMutation
 } from "./graphql/mutations";
+
+// Optional Config object, but defaults to demo api-key and eth-mainnet.
+const settings = {
+  apiKey: "CB-QgjFspXqe-NNDKq694tzcDuAtmpNs", // Replace with your Alchemy API Key.
+  network: Network.ETH_MAINNET, // Replace with your network.
+};
+const alchemy = new Alchemy(settings);
+
+let currentBlock;
+alchemy.core.getBlockNumber().then(data => {currentBlock = data; console.log(currentBlock)});
 
 const App = ({ signOut }) => {
   const [notes, setNotes] = useState([]);
@@ -38,6 +50,44 @@ const App = ({ signOut }) => {
       })
     );
     setNotes(notesFromAPI);
+  }
+
+  async function createBookmark(event){
+    alert('hello world!');
+    var currentUnixTime = date.Now();
+    event.preventDefault();
+    const newBookmarks = await API.graphql({
+      query: CreateBookmarksMutation,
+      variables: {
+          input: {
+      "user_id": "a3f4095e-39de-43d2-baf4-f8c16f0f6f4d",
+      "bookmark_type": "Lorem ipsum dolor sit amet",
+      "bookmark_value": "Lorem ipsum dolor sit amet",
+      "timestamp_unix": 1023123,
+      "comments": "Lorem ipsum dolor sit amet"
+    }
+      }
+  });
+    //event.target.reset();
+  }
+
+  async function createTestNote(event){
+    alert('hello world!');
+    event.preventDefault();
+    //const form = new FormData(event.target);
+    //const image = form.get("image");
+    const data = {
+      name: "testnote"+Math.random(),
+      description: Math.random(),
+      image: null
+    };
+    //if (!!data.image) await Storage.put(data.name, image);
+    await API.graphql({
+      query: createNoteMutation,
+      variables: { input: data },
+    });
+    fetchNotes();
+    //event.target.reset();
   }
 
   async function createNote(event) {
@@ -71,6 +121,7 @@ const App = ({ signOut }) => {
   return (
     <View className="App">
       <Heading level={1}>My Notes App</Heading>
+      <h1>Current block: {currentBlock} <button onClick={createBookmark}>Save</button></h1>
       <View as="form" margin="3rem 0" onSubmit={createNote}>
         <Flex direction="row" justifyContent="center">
           <TextField
