@@ -13,4 +13,4 @@ type Bookmark @model @auth(rules: [{allow: public}]) {
   bookmark_type: Int!
   bookmark_value: String!
   timestamp_unix: AWSTimestamp
-} am
+} 
