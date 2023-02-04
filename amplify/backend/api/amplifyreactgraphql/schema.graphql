@@ -4,4 +4,13 @@ type Note @model @auth(rules: [{allow: public}]) {
   description: String
   image: String
 }
- 
+
+type Bookmark @model @auth(rules: [{allow: public}]) {
+  id: ID!
+  user_id: String!
+  name: String!
+  description: String
+  bookmark_type: Int!
+  bookmark_value: String!
+  timestamp_unix: AWSTimestamp
+} am

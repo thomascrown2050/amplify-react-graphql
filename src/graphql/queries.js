@@ -32,3 +32,40 @@ export const listNotes = /* GraphQL */ `
     }
   }
 `;
+export const getBookmark = /* GraphQL */ `
+  query GetBookmark($id: ID!) {
+    getBookmark(id: $id) {
+      id
+      user_id
+      name
+      description
+      bookmark_type
+      bookmark_value
+      timestamp_unix
+      createdAt
+      updatedAt
+    }
+  }
+`;
+export const listBookmarks = /* GraphQL */ `
+  query ListBookmarks(
+    $filter: ModelBookmarkFilterInput
+    $limit: Int
+    $nextToken: String
+  ) {
+    listBookmarks(filter: $filter, limit: $limit, nextToken: $nextToken) {
+      items {
+        id
+        user_id
+        name
+        description
+        bookmark_type
+        bookmark_value
+        timestamp_unix
+        createdAt
+        updatedAt
+      }
+      nextToken
+    }
+  }
+`;

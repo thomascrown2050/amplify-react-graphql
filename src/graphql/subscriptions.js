@@ -37,3 +37,48 @@ export const onDeleteNote = /* GraphQL */ `
     }
   }
 `;
+export const onCreateBookmark = /* GraphQL */ `
+  subscription OnCreateBookmark($filter: ModelSubscriptionBookmarkFilterInput) {
+    onCreateBookmark(filter: $filter) {
+      id
+      user_id
+      name
+      description
+      bookmark_type
+      bookmark_value
+      timestamp_unix
+      createdAt
+      updatedAt
+    }
+  }
+`;
+export const onUpdateBookmark = /* GraphQL */ `
+  subscription OnUpdateBookmark($filter: ModelSubscriptionBookmarkFilterInput) {
+    onUpdateBookmark(filter: $filter) {
+      id
+      user_id
+      name
+      description
+      bookmark_type
+      bookmark_value
+      timestamp_unix
+      createdAt
+      updatedAt
+    }
+  }
+`;
+export const onDeleteBookmark = /* GraphQL */ `
+  subscription OnDeleteBookmark($filter: ModelSubscriptionBookmarkFilterInput) {
+    onDeleteBookmark(filter: $filter) {
+      id
+      user_id
+      name
+      description
+      bookmark_type
+      bookmark_value
+      timestamp_unix
+      createdAt
+      updatedAt
+    }
+  }
+`;

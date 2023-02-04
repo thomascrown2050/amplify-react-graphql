@@ -2,11 +2,5 @@
   "AppSyncApiName": "amplifyreactgraphql",
   "DynamoDBBillingMode": "PAY_PER_REQUEST",
   "DynamoDBEnableServerSideEncryption": false,
-  "AuthModeLastUpdated": "2023-01-23T14:50:11.600Z",
-  "AuthCognitoUserPoolId": {
-    "Fn::GetAtt": [
-      "authamplifyreactgraphql48677355",
-      "Outputs.UserPoolId"
-    ]
-  }
+  "AuthModeLastUpdated": "2023-01-26T04:53:51.057Z"
 }

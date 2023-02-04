@@ -1,11 +1,38 @@
-.App {
-  text-align: center;
+:root{
+  height: 100%;
+  width: 100%;
+  margin: 0;
+  padding: 0;
+  background-repeat: no-repeat;
+  background-attachment: fixed;
+  background-image: linear-gradient(
+  45deg,
+  hsl(240deg 50% 20%) 0%,
+  hsl(289deg 100% 21%) 11%,
+  hsl(315deg 100% 27%) 22%,
+  hsl(329deg 100% 36%) 33%,
+  hsl(337deg 100% 43%) 44%,
+  hsl(357deg 91% 59%) 56%,
+  hsl(17deg 100% 59%) 67%,
+  hsl(34deg 100% 53%) 78%,
+  hsl(45deg 100% 50%) 89%,
+  hsl(55deg 100% 50%) 100%
+);
+  overflow-x: visible;
+  overflow-y: visible;
 }
 
+.App {
+  padding: 2%;
+}
+
+/*
 .App-logo {
   height: 40vmin;
   pointer-events: none;
 }
+*/
+
 
 @media (prefers-reduced-motion: no-preference) {
   .App-logo {
@@ -35,4 +62,72 @@
   to {
     transform: rotate(360deg);
   }
+}
+
+table, th, td{
+border: 2px solid;
+border-collapse: collapse;
+}
+th, td{
+  text-align:left;
+  padding: 5px;
+}
+
+.funHeading{
+  font-size: 124px;
+  background: -webkit-linear-gradient(#6082B6, #191f22);
+  text-shadow: #FC0 10px 0 10px;
+  -webkit-background-clip: text;
+  background-clip: text;
+  margin-top: 0%;
+  padding:0%;
+  margin-bottom:0%;
+
+}
+
+button{
+  background-color:transparent;
+}
+
+
+/* https://codepen.io/thelittleblacksmith/pen/zXNVvY */
+.fancyLink {
+  text-decoration: none;
+  color: inherit;
+  border-bottom: 3px solid #ff8cbc;
+  transition: all 0.25s linear;
+  position: relative;
+}
+
+.fancyLink:before {
+  content: "";
+  display: block;
+  width: 100%;
+  height: 3px;
+  background-color: #61a3ff;
+  position: absolute;
+  left: 0;
+  bottom: -3px; /* this is to match where the border is */
+  transform-origin: left; 
+  transform: scale(0);
+  transition: 0.25s linear;
+/*   will-change: transform; */
+}
+
+.fancyLink:hover:before {
+  transform: scale(1);
+}
+
+.undecoratedLink{
+  color: inherit;
+  text-decoration: none;
+}
+
+#currentBlockInfo{
+  display:inline;
+}
+
+#loginObject{
+  font-size:0.5em;
+float: right;  
 }
