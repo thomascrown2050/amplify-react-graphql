@@ -1,26 +1,21 @@
 import React, { useState, useEffect } from "react";
-import App from "./App";
+import {whales_data, buildWhaleTable} from "./Whales";
+import * as ReactDOM from 'react-dom';
 import { API, Storage, Auth} from "aws-amplify";
 import {
     createBookmark as createBookmarkMutation
   } from "./graphql/mutations";
 import { Network, Alchemy, Utils } from "alchemy-sdk";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { faBookBookmark, faBookmark, faCoffee } from '@fortawesome/free-solid-svg-icons'
+import {  faBookmark } from '@fortawesome/free-solid-svg-icons'
 
 import {
-  Button,
-  Flex,
-  Heading,
-  Image,
-  Table,
-  Text,
-  TextField,
   View,
   withAuthenticator,
 } from "@aws-amplify/ui-react";
+import toast, { Toaster } from 'react-hot-toast';
 
-//Declare variables
+
 let currentBlock;
 let previousBlock1;
 let previousBlock2;
@@ -42,6 +37,11 @@ let thisblockMaxFeePerGas;
 let thisblockTransactionLength;
 
 let authUserId;
+
+let blockFromAddresses = [];
+
+const notify_saved_bookmark = () => toast.success('Your bookmark has been saved.', {duration: 3000});
+const notify_ENS_completed = () => toast.success('All ENS and ETH holdings data added.', {duration: 3000});
 
 //Setup user authentication data
 Auth.currentAuthenticatedUser({
@@ -65,9 +65,80 @@ alchemy.core.getBlockNumber().then(data => {
     previousBlock3 = currentBlock-3;
   });
 
+  
+
+    let fromENSnfts = [];
+    let NFTresponse;
+
+    let holdingsArray = [];
+    let thisWalletETH;
+    let formattedThisWalletETH;
+    let ensContractAddress = "0x57f1887a8BF19b14fC0dF6Fd9B2acc9Af147eA85";
+    let filteredEtherscanENSlink = "https://etherscan.io/token/0x57f1887a8bf19b14fc0df6fd9b2acc9af147ea85?a=";
+    
+    async function getAllENS(fromArray){
+      
+      for(let i=0; i<thisblockTransactionLength;i++){
+        let walletAddress = fromArray[i];
+        let customENSESlink = filteredEtherscanENSlink+walletAddress+"#inventory";
+        let fullENSString;
+        let ENShtml;
+
+      //Get and set ENS names
+      setTimeout(await alchemy.nft.getNftsForOwner(walletAddress, {contractAddresses: [ensContractAddress]}).then(
+        function(data){
+          //console.log(data);
+          if(data["ownedNfts"].length>0){
+            fullENSString = data["ownedNfts"][0]["title"];
+            for(let j=0; j<data["ownedNfts"].length; j++){
+              ENShtml = "<a class='undecoratedLink' rel='noopener noreferrer' target='_blank' href='https://opensea.io/"+walletAddress+"'>"+data["ownedNfts"][0]["title"]+"<img class='tableExternalIcon' src='../media/opensea-logo-white.png' alt='OS_logo' resizeMode='contain' /></a><a href='https://etherscan.io/address/"+walletAddress+"'><img class='tableExternalIcon' src='../media/etherscan-logo-light-circle.png' alt='ES_logo' resizeMode='contain' /></a>";
+              if(j>0){
+              fullENSString = fullENSString.concat(", ", data["ownedNfts"][j]["title"]);  
+              ENShtml = "<a class='undecoratedLink' rel='noopener noreferrer' target='_blank' href='https://opensea.io/"+walletAddress+"'>"+fullENSString+"<img class='tableExternalIcon' src='../media/opensea-logo-white.png' alt='OS_logo' resizeMode='contain' /></a><a class='undecoratedLink' rel='noopener noreferrer' target='_blank' href='"+customENSESlink+"'><img class='tableExternalIcon' src='../media/etherscan-logo-light-circle.png' alt='ES_logo' resizeMode='contain' /></a>"
+              }
+            }
+            try{document.getElementById("ENS"+walletAddress).innerHTML = ENShtml}catch(error){console.log(error);}
+            fromENSnfts.push({[walletAddress]: data["ownedNfts"][0]["title"]})            
+          };
+        }), 50);
+
+        //Fetch and construct ETH holdings array
+        alchemy.core.getBalance(walletAddress, "latest").then(function(data){
+          thisWalletETH = data["_hex"];
+          if(thisWalletETH==undefined){
+            thisWalletETH = 0;
+          }
+          formattedThisWalletETH = Utils.formatEther(thisWalletETH);
+          holdingsArray.push({[walletAddress]: formattedThisWalletETH});
+      });
+        
+        //Set ETH holdings in UI (TBD token holdings)
+        for(let k=0; k<holdingsArray.length; k++){
+       let helperElement= Object.keys(holdingsArray[k]);
+       try{
+         document.getElementById("ETHholdings"+helperElement).innerHTML = Object.values(holdingsArray[k]);
+       }catch (error) {
+        //console.error(error);
+      }
+      }
+      
+      //Look for whale address matches and update in the DOM
+      var resultWhale = whales_data.find(item => item.address === walletAddress);
+      if(resultWhale!=undefined)
+      {
+        try{
+        document.getElementById("addressLabel"+walletAddress).innerHTML = resultWhale.name;
+        }
+        catch(error){}
+      }
+
+        
+      }  
+      //Browser notification to say we updated data
+      notify_ENS_completed();
+      }      
 
   async function createBookmark(event, hash, user_id, bookmarkType){
-
     if(user_id===null){
       user_id = 1;
     }
@@ -88,42 +159,15 @@ alchemy.core.getBlockNumber().then(data => {
     }
       }
   }).catch(e => {console.log(e)})
-  //const apiBookmarkData = await API.graphql({ query: listBookmarks });
-  //const bookmarksFromAPI = apiBookmarkData.data.listBookmarks.items.then(console.log("Bookmarks" + bookmarksFromAPI));
-  
-  }
 
-/*
-const passedBlockTransactionsData = alchemy.core
-  .getBlockWithTransactions(
-   currentBlock
-  ).then(data => {
-    blockTimestamp = data["timestamp"];
-    let bts = new Date (blockTimestamp * 1000);
-    blockTimestampUTCString = bts.toUTCString();
-    blockTimestampLocalString = bts.toTimeString();
-
-    blockGasLimit = data["gasLimit"];
-    blockGasLimitHexValue = blockGasLimit._hex;
-    blockGasLimitDecValue = parseInt(blockGasLimitHexValue);
-    blockGasUsed = data["gasUsed"];
-    blockGasUsedHexValue = blockGasUsed._hex;
-    blockGasUsedDecValue = parseInt(blockGasUsedHexValue);
-    blockMaxPriorityFeePerGas = data["maxPriorityFeePerGas"];
-    blockMaxFeePerGas = data["maxFeePerGas"];
-    blockTransactionLength = data["transactions"].length;
-    listTransactions = data["transactions"].map(
-      (individualTransaction) =><tr key={individualTransaction.hash}><td key={individualTransaction.hash}><a className="undecoratedLink" target='_blank' href={`https://etherscan.io/tx/` + individualTransaction.hash}>{individualTransaction.hash}</a></td><td>{Utils.formatEther(individualTransaction.value)}</td><td><a className="undecoratedLink" target='_blank' href={`https://etherscan.io/address/` + individualTransaction.from}>{individualTransaction.from}</a></td><td><a className="undecoratedLink" target='_blank' href={`https://etherscan.io/address/` + individualTransaction.to}>{individualTransaction.to}</a></td><td><a className="undecoratedLink" target='_blank' href={`https://etherscan.io/tx/${individualTransaction.hash}`}>View</a></td><td><button onClick={(e) => {createBookmark(e, individualTransaction.hash, authUserId, 1)}}><FontAwesomeIcon icon={faBookmark} /></button></td></tr>
-      );
-  })
-  */
-
+}
 
 const TableBlockTransactions =  (props)  =>{
 
 let blockToUse = props.block;
-console.log(typeof(blockToUse));
-//let blockToUseInt = Number(blockToUse);
+
+const blockFromAddresses = [];    
+const blockToAddresses = [];    
 
 const passedBlockTransactionsData = alchemy.core
   .getBlockWithTransactions(
@@ -143,26 +187,54 @@ const passedBlockTransactionsData = alchemy.core
     thisblockMaxPriorityFeePerGas = data["maxPriorityFeePerGas"];
     thisblockMaxFeePerGas = data["maxFeePerGas"];
     thisblockTransactionLength = data["transactions"].length;
+
     listTransactions2 = data["transactions"].map(
-      (individualTransaction) =><tr key={individualTransaction.hash}><td key={individualTransaction.hash}><a className="undecoratedLink" target='_blank' href={`https://etherscan.io/tx/` + individualTransaction.hash}>{individualTransaction.hash}</a></td><td>{Utils.formatEther(individualTransaction.value)}</td><td><a className="undecoratedLink" target='_blank' href={`https://etherscan.io/address/` + individualTransaction.from}>{individualTransaction.from}</a></td><td><a className="undecoratedLink" target='_blank' href={`https://etherscan.io/address/` + individualTransaction.to}>{individualTransaction.to}</a></td><td><a className="undecoratedLink" target='_blank' href={`https://etherscan.io/tx/${individualTransaction.hash}`}>View</a></td><td><button onClick={(e) => {createBookmark(e, individualTransaction.hash, authUserId, 1)}}><FontAwesomeIcon icon={faBookmark} /></button></td></tr>
+      (individualTransaction) => (
+      blockFromAddresses.push(individualTransaction.from),
+      blockToAddresses.push(individualTransaction.to),
+      <tr key={individualTransaction.hash}><td key={individualTransaction.hash}><a className="undecoratedLink" rel="noopener noreferrer" target='_blank' href={`https://etherscan.io/tx/` + individualTransaction.hash}>{individualTransaction.hash}</a></td>
+      <td>{Utils.formatEther(individualTransaction.value)}</td>
+      <td><a className="undecoratedLink" rel="noopener noreferrer" href={`/address/${individualTransaction.from}`}>{individualTransaction.from}</a><a className="undecoratedLink" rel="noopener noreferrer" target='_blank' href={`https://etherscan.io/address/` + individualTransaction.from}><img class='tableExternalIcon' src='../media/etherscan-logo-light-circle.png' alt='ES_logo' resizeMode='contain' /></a></td>
+      <td id={"addressLabel"+individualTransaction.from}>-</td>
+      <td id={"ETHholdings"+individualTransaction.from}>-</td>
+      <td id={"ENS"+individualTransaction.from}><a className="undecoratedLink" rel="noopener noreferrer" target='_blank' href={`https://opensea.io/` + individualTransaction.from}>-</a></td>
+      <td><a className="undecoratedLink" rel="noopener noreferrer" href={`/address/${individualTransaction.to}`}>{individualTransaction.to}</a><a className="undecoratedLink" rel="noopener noreferrer" target='_blank' href={`https://etherscan.io/address/` + individualTransaction.to}><img class='tableExternalIcon' src='../media/etherscan-logo-light-circle.png' alt='ES_logo' resizeMode='contain' /></a></td>
+      <td id={"addressLabel"+individualTransaction.to}>-</td>
+      <td id={"ETHholdings"+individualTransaction.to}>-</td>
+      <td id={"ENS"+individualTransaction.to}><a className="undecoratedLink" rel="noopener noreferrer" target='_blank' href={`https://opensea.io/` + individualTransaction.to}>-</a></td>
+      <td><a className="undecoratedLink" rel="noopener noreferrer" target='_blank' href={`https://etherscan.io/tx/${individualTransaction.hash}`}>View</a></td>
+      <td><button onClick={(e) => {notify_saved_bookmark(); createBookmark(e, individualTransaction.hash, authUserId, 1)}}><FontAwesomeIcon icon={faBookmark} /></button></td></tr>
+      )
       );
-    console.log(listTransactions2);
-    //console.log(blockToUseInt);
+      setTimeout(getAllENS(blockFromAddresses), 2000);
+      setTimeout(getAllENS(blockToAddresses), 2000);      
   })
 
+
   useEffect(() => {
-//console.log('test');
+    
   }, [])
 
     return (
 <View>
 <div>
-
-<table><tbody><tr><th>tx hash</th><th>ETH</th><th>From</th><th>To</th><th>View</th><th>Save</th></tr>{listTransactions2}</tbody></table>        
+<Toaster />
+</div>
+<div>
+<table><tbody><tr><th className="tableLabel">tx hash</th>
+<th className="tableLabel">ETH</th><th className="tableLabel">From</th>
+<th>From: Label</th>
+<th>From: ETH Holdings</th>
+<th>From: ENS</th> 
+<th className="tableLabel">To</th>
+<th>To: Label</th>
+<th>To: ETH Holdings</th>
+<th>To: ENS</th>
+<th className="tableLabel">View</th><th className="tableLabel">Save</th></tr>
+{listTransactions2}</tbody></table>        
 </div>
 </View>
     );
     }
-//<span>Block: {props.block}</span>
 
 export default TableBlockTransactions;

@@ -6,10 +6,14 @@ import {
 } from "react-router-dom";
 import './index.css';
 import App from './App';
+import AddressDetails from './AddressDetails.js'
 import BlockDetails from './BlockDetails.js'
+import MyBlockmarks from './components.js/MyBlockmarks';
+import Whales from './Whales.js'
 import reportWebVitals from './reportWebVitals';
 import { Amplify } from 'aws-amplify';
 import config from './aws-exports';
+
 Amplify.configure(config);
 
 const router = createBrowserRouter([
@@ -21,6 +25,21 @@ const router = createBrowserRouter([
   {
     path: "block/:blockId",
     element: <BlockDetails />,
+  },
+
+  {
+    path: "address/:addressId",
+    element: <AddressDetails />,
+  },
+
+  {
+    path: "/blockmarks",
+    element: <MyBlockmarks />,
+  },
+
+  {
+    path: "/whales",
+    element: <Whales />,
   },
 
 ]);

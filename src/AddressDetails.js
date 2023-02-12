@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import TableBlockTransactions from "./TableBlockTransactions";
+import AddressInformation from "./AddressInformation";
 import {
   Link,
   useParams
@@ -13,8 +13,7 @@ import {
 import { listNotes, listBookmarks } from "./graphql/queries";
 import LoginObject from "./LoginObject";
 
-//Find a way to clean up this function and remove things about notes you dojn't use
-const BlockDetails = ({ signOut }) => {
+const AddressDetails = ({ signOut }) => {
         const [notes, setNotes] = useState([]);
 
         useEffect(() => {
@@ -36,17 +35,17 @@ const BlockDetails = ({ signOut }) => {
             setNotes(notesFromAPI);
           }
 
-let { blockId } = useParams();
-let blockIdNumber = Number(blockId);
+let { addressId } = useParams();
+let addressIdNumber = Number(addressId);
 
 return (
 <View className="App">
 <LoginObject />
-<h1>Block: <Link to={`https://etherscan.io/block/` + blockId} target="_blank" rel="noopener noreferrer"></Link>{blockId}</h1>
-<TableBlockTransactions block={blockIdNumber} />
+<h1>Address: <Link to={`https://etherscan.io/address/` + addressId} target="_blank" rel="noopener noreferrer"></Link>{addressId}</h1>
+<AddressInformation address={addressId} />
 </View>
 )
 
 }
 
-export default BlockDetails
+export default AddressDetails
